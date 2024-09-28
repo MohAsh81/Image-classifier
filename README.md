@@ -1,2 +1,2 @@
-# Image-classifier
-This project is a web app that allows users to drag and drop images of celebrities to identify them using machine learning. The site features real-time recognition, providing the celebrity’s name and details instantly. Built with deep learning models, it offers a user-friendly interface and accurate results across various devices.
+# Image-Classifier
+This project involves developing a web application that allows users to drag and drop images of celebrities to identify them using machine learning. The core feature of the application is an intelligent image recognition system powered by deep learning models that can accurately detect and recognize the faces of celebrities. The website provides an intuitive user experience where users can easily interact with the interface to upload an image, and the system will return the name and details of the celebrity within seconds.
