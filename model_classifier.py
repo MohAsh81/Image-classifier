@@ -1,3 +1,8 @@
+from sklearn.metrics import classification_report
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 import pywt
 import numpy as np
 import shutil
@@ -34,8 +39,9 @@ def get_cropped_image_if_2_eyes(image_path):
 path_to_data = "Projects/Image-classifier/Pictures"
 path_to_cr_data = "Projects/Image-classifier/Pictures/Cropped"
 
-# Get directories for each celebrity
-img_dirs = [entry.path for entry in os.scandir(path_to_data) if entry.is_dir()]
+# Get directories for each celebrity, skipping "Cropped"
+img_dirs = [entry.path for entry in os.scandir(path_to_data)
+            if entry.is_dir() and entry.name != "Cropped"]
 
 # Clean up previous cropped folder if exists
 if os.path.exists(path_to_cr_data):
@@ -75,6 +81,15 @@ for img_dir in img_dirs:
                     cropped_file_path)
                 count += 1
 
+# Creating the class dictionary (without "Cropped")
+class_dict = {}
+count = 0
+for celebrity_name in celebrity_file_names_dict.keys():
+    class_dict[celebrity_name] = count
+    count += 1
+
+print(class_dict)
+
 
 def w2d(img, mode='haar', level=1):
     imArray = img
@@ -99,13 +114,6 @@ def w2d(img, mode='haar', level=1):
     return imArray_H
 
 
-class_dict = {}
-count = 0
-for celebrity_name in celebrity_file_names_dict.keys():
-    class_dict[celebrity_name] = count
-    count = count + 1
-class_dict
-
 X, y = [], []
 for celebrity_name, training_files in celebrity_file_names_dict.items():
     for training_image in training_files:
@@ -118,4 +126,12 @@ for celebrity_name, training_files in celebrity_file_names_dict.items():
         X.append(combined_img)
         y.append(class_dict[celebrity_name])
 
+X = np.array(X).reshape(len(X), 4096).astype(float)
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+pipe = Pipeline([('scaler', StandardScaler()),
+                ('svc', SVC(kernel='rbf', C=10))])
+pipe.fit(X_train, y_train)
+
+print(classification_report(y_test, pipe.predict(X_test)))
