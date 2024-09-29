@@ -1,3 +1,8 @@
+import json
+import joblib
+from matplotlib import pyplot as plt
+import seaborn as sn
+from sklearn.metrics import confusion_matrix
 import pandas as pd
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import make_pipeline
@@ -178,4 +183,16 @@ for algo, mp in model_params.items():
 
 df = pd.DataFrame(scores, columns=['model', 'best_score', 'best_params'])
 
-print(df)
+best_clf = best_estimators['svm']
+cm = confusion_matrix(y_test, best_clf.predict(X_test))
+plt.figure(figsize=(10, 7))
+sn.heatmap(cm, annot=True)
+plt.xlabel('Predicted')
+plt.ylabel('Truth')
+plt.show()
+
+# Save the model as a pickle in a file
+joblib.dump(best_clf, 'saved_model.pkl')
+
+with open("class_dictionary.json", "w") as f:
+    f.write(json.dumps(class_dict))
